@@ -24,6 +24,15 @@ struct sdl_texture
         return *this;
     }
 
+    void update( SDL_Renderer *renderer, const void *pixels, int pitch )
+    {
+        if ( SDL_UpdateTexture( _texture, nullptr, pixels, pitch ) < 0 )
+            sdl_error();
+
+        if ( SDL_RenderCopy( renderer, _texture, nullptr, nullptr ) < 0 )
+            sdl_error();
+    }
+
     ~sdl_texture()
     {
         destroy();

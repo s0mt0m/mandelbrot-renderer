@@ -2,6 +2,7 @@
 #include <SDL.h>
 
 #include "sdl_error.hpp"
+#include "sdl_texture.hpp"
 
 struct sdl_renderer
 {
@@ -36,6 +37,23 @@ struct sdl_renderer
     void render()
     {
         SDL_RenderPresent( _renderer );
+    }
+
+    sdl_texture create_texture( int width, int height )
+    {
+        const auto format = SDL_PIXELFORMAT_ARGB8888;
+        const auto access = SDL_TEXTUREACCESS_STREAMING;
+        auto texture = SDL_CreateTexture( _renderer, format, access,
+                                          width, height );
+        if ( texture == nullptr )
+            sdl_error();
+
+        return sdl_texture( texture );
+    }
+
+    void update( sdl_texture &texture, const void *pixels, int pitch )
+    {
+        texture.update( _renderer, pixels, pitch );
     }
 
     ~sdl_renderer()
