@@ -5,11 +5,14 @@
 
 struct sdl_context
 {
-    sdl_context()
+    static sdl_context &get_context()
     {
-        if ( SDL_Init( SDL_INIT_VIDEO ) < 0 )
-            sdl_error();
+        static sdl_context _context;
+        return _context;
     }
+
+    sdl_context( const sdl_context & ) = delete;
+    sdl_context &operator =( const sdl_context & ) = delete;
 
     bool should_quit() const
     {
@@ -25,5 +28,11 @@ struct sdl_context
     {
         SDL_Quit();
     }
-};
 
+private:
+    sdl_context()
+    {
+        if ( SDL_Init( SDL_INIT_VIDEO ) < 0 )
+            sdl_error();
+    }
+};
