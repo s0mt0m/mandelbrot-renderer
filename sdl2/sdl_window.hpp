@@ -6,20 +6,30 @@
 
 struct sdl_window
 {
-    sdl_window( const char *name, int width, int height,
-            int flags = SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE,
-            int pos_x = SDL_WINDOWPOS_UNDEFINED,
-            int pos_y = SDL_WINDOWPOS_UNDEFINED )
-        : _window( SDL_CreateWindow( name, pos_x, pos_y,
-                                     width, height, flags ) )
+    sdl_window( SDL_Window *window )
+        : _window( window )
+    {}
+
+    sdl_window( const sdl_window & ) = delete;
+    sdl_window &operator =( const sdl_window & ) = delete;
+
+    sdl_window( sdl_window &&o ) noexcept
+        : _window( std::exchange( o._window, nullptr ) )
+    {}
+
+    sdl_window &operator =( sdl_window &&o ) noexcept
     {
-        if ( _window == nullptr )
-            sdl_error();
+        std::swap( _window, o._window );
+        return *this;
     }
 
     sdl_renderer create_renderer( int index = -1, Uint32 flags = 0 )
     {
-        return sdl_renderer( _window, index, flags );
+        auto renderer = SDL_CreateRenderer( _window, index, flags );
+        if ( renderer == nullptr )
+            sdl_error();
+
+        return sdl_renderer( renderer );
     }
 
     ~sdl_window()

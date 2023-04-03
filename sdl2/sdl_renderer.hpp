@@ -5,11 +5,21 @@
 
 struct sdl_renderer
 {
-    sdl_renderer( SDL_Window *window, int index, Uint32 flags )
-        : _renderer( SDL_CreateRenderer( window, index, flags ) )
+    sdl_renderer( SDL_Renderer *renderer )
+        : _renderer( renderer )
+    {}
+
+    sdl_renderer( const sdl_renderer & ) = delete;
+    sdl_renderer &operator =( const sdl_renderer & ) = delete;
+
+    sdl_renderer( sdl_renderer &&o ) noexcept
+        : _renderer( std::exchange( o._renderer, nullptr ) )
+    {}
+
+    sdl_renderer &operator =( sdl_renderer &&o ) noexcept
     {
-        if ( _renderer == nullptr )
-            sdl_error();
+        std::swap( _renderer, o._renderer );
+        return *this;
     }
 
     void clear()
