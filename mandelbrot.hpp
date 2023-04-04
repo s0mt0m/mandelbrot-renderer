@@ -4,6 +4,7 @@
 #include <cassert>
 #include <complex>
 #include <string_view>
+#include <thread>
 #include <tuple>
 #include <vector>
 
@@ -132,22 +133,40 @@ struct mandelbrot
 
     void compute_values()
     {
+        int thread_count = std::thread::hardware_concurrency();
+        std::vector< std::thread > threads;
+
+        for ( int i = 0; i < thread_count; ++i )
+        {
+            const auto curr_y = _height * i / 8;
+            const auto next_y = _height * ( i + 1 ) / 8;
+            threads.emplace_back( &mandelbrot::compute_block,
+                                  this, curr_y, next_y );
+        }
+
+        for ( auto &thread : threads )
+            thread.join();
+
+        _renderer.update( _texture, _data.data(), _width * sizeof( uint32_t ) );
+    }
+
+    void compute_block( int from, int to )
+    {
         const float_t start_x = _window.real_x( 0, _width );
-        const float_t start_y = _window.real_y( 0, _height );
+        const float_t start_y = _window.real_y( from, _height );
 
         const float_t end_x = _window.real_x( _width, _width );
-        const float_t end_y = _window.real_y( _height, _height );
+        const float_t end_y = _window.real_y( to, _height );
 
         const float_t step_x = ( end_x - start_x ) / _width;
-        const float_t step_y = ( end_y - start_y ) / _height;
+        const float_t step_y = ( end_y - start_y ) / ( to - from );
 
         float_t px, py;
         int x, y;
         for ( x = 0, px = start_x; x < _width; ++x, px += step_x )
-            for ( y = 0, py = start_y; y < _height; ++y, py += step_y )
+            for ( y = from, py = start_y; y < to; ++y, py += step_y )
                 compute_pixel( { px, py }, x, y );
 
-        _renderer.update( _texture, _data.data(), _width * sizeof( uint32_t ) );
     }
 
     void compute_pixel( std::complex< float_t > c, int x, int y )
