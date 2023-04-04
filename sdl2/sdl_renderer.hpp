@@ -2,6 +2,7 @@
 #include <SDL.h>
 
 #include "sdl_error.hpp"
+#include "sdl_surface.hpp"
 #include "sdl_texture.hpp"
 
 struct sdl_renderer
@@ -41,14 +42,24 @@ struct sdl_renderer
 
     sdl_texture create_texture( int width, int height )
     {
-        const auto format = SDL_PIXELFORMAT_ARGB8888;
-        const auto access = SDL_TEXTUREACCESS_STREAMING;
+        const static auto format = SDL_PIXELFORMAT_ARGB8888;
+        const static auto access = SDL_TEXTUREACCESS_STREAMING;
         auto texture = SDL_CreateTexture( _renderer, format, access,
                                           width, height );
         if ( texture == nullptr )
             sdl_error();
 
         return sdl_texture( texture );
+    }
+
+    sdl_surface create_surface( void *pixels, int width, int height )
+    {
+        auto surface = SDL_CreateRGBSurfaceFrom( pixels, width, height,
+                32, width * sizeof( uint32_t ), 0, 0, 0, 0 );
+        if ( surface == nullptr )
+            sdl_error();
+
+        return sdl_surface( surface );
     }
 
     void update( sdl_texture &texture, const void *pixels, int pitch )
