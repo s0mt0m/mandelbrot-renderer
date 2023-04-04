@@ -34,7 +34,7 @@ int main()
             }
             else if ( event.type == SDL_WINDOWEVENT )
             {
-                if ( event.window.event == SDL_WINDOWEVENT_EXPOSED )
+                if ( event.window.event == SDL_WINDOWEVENT_RESIZED )
                     mb.resize( event.window.data1, event.window.data2 );
             }
         }
