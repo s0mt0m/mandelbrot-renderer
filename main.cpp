@@ -20,6 +20,10 @@ int main()
 
     mandelbrot mb( renderer, width, height );
 
+    renderer.set_colour( 0, 0, 0 );
+    renderer.clear();
+    renderer.render();
+
     SDL_Event event;
     while ( !context.should_quit() )
     {
