@@ -109,6 +109,9 @@ struct mandelbrot
         if ( width == 0 || height == 0 )
             return;
 
+        _window.width *= float_t( width ) / _width;
+        _window.height *= float_t( height ) / _height;
+
         _width = width;
         _height = height;
 
