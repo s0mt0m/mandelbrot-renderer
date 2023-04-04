@@ -58,7 +58,8 @@ struct sdl_renderer
 
     ~sdl_renderer()
     {
-        SDL_DestroyRenderer( _renderer );
+        if ( _renderer != nullptr )
+            SDL_DestroyRenderer( _renderer );
     }
 
 private:

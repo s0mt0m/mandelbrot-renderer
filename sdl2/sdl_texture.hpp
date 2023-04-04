@@ -35,15 +35,11 @@ struct sdl_texture
 
     ~sdl_texture()
     {
-        destroy();
-    }
-
-private:
-    void destroy()
-    {
         if ( _texture != nullptr )
             SDL_DestroyTexture( _texture );
     }
+
+private:
 
     SDL_Texture *_texture;
 };

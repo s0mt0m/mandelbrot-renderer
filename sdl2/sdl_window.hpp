@@ -34,7 +34,8 @@ struct sdl_window
 
     ~sdl_window()
     {
-        SDL_DestroyWindow( _window );
+        if ( _window != nullptr )
+            SDL_DestroyWindow( _window );
     }
 
 private:
