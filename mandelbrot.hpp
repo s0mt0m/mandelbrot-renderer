@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <cassert>
 #include <complex>
 #include <string_view>
@@ -12,8 +13,29 @@
 template< typename float_t = double >
 struct mandelbrot
 {
+    using colour_t = std::tuple< int, int, int >;
+
     constexpr static float_t ratio = float_t( 2 ) / float_t( 3 );
-    constexpr static int max_iterations = 256;
+    constexpr static int max_iterations = 64;
+    constexpr static std::array< colour_t, 16 > colours{ {
+        {  66,  30,  15 },
+        {  25,   7,  26 },
+        {   9,   1,  47 },
+        {   4,   4,  73 },
+        {   0,   7, 100 },
+        {  12,  44, 138 },
+        {  24,  82, 177 },
+        {  57, 125, 209 },
+        { 134, 181, 229 },
+        { 211, 236, 248 },
+        { 241, 233, 191 },
+        { 248, 201,  95 },
+        { 255, 170,   0 },
+        { 204, 128,   0 },
+        { 153,  87,   0 },
+        { 106,  52,   3 },
+    } };
+
     struct window;
 
     int _width;
@@ -34,9 +56,7 @@ struct mandelbrot
           _renderer( renderer ),
           _texture( _renderer.create_texture( _width, _height ) ),
           _data( _width * _height, 0 )
-    {
-        update();
-    }
+    {}
 
     struct window
     {
@@ -139,19 +159,12 @@ struct mandelbrot
         }
 
         if ( n == max_iterations )
-        {
             set_colour( x, y, { 0, 0, 0 } );
-        }
         else
-        {
-            if ( n > max_iterations / 2 )
-                set_colour( x, y, { n, 255, n } );
-            else
-                set_colour( x, y, { 0, n, 0 } );
-        }
+            set_colour( x, y, colours[ n % 16 ] );
     }
 
-    void set_colour( int x, int y, std::tuple< int, int, int > rgb )
+    void set_colour( int x, int y, colour_t rgb )
     {
         auto [ r, g, b ] = rgb;
         _data[ y * _width + x ] = 0xFF << 24 | r << 16 | g << 8 | b;
