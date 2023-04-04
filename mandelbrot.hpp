@@ -172,5 +172,13 @@ struct mandelbrot
         auto [ r, g, b ] = rgb;
         _data[ y * _width + x ] = 0xFF << 24 | r << 16 | g << 8 | b;
     }
+
+    void save( std::string_view filename )
+    {
+        update();
+
+        auto s = _renderer.create_surface( _data.data(), _width, _height );
+        s.save_image( filename );
+    }
 };
 
