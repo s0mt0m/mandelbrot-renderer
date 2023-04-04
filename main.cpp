@@ -1,4 +1,5 @@
 #include <SDL.h>
+#include <SDL_image.h>
 
 #include <iostream>
 #include <string_view>
@@ -8,8 +9,24 @@
 #include "sdl2/sdl_window.hpp"
 
 
-int main()
+int main( int argc, char **argv )
 {
+    bool interactive = false;
+    std::string_view filename = "mandelbrot.png";
+
+    for ( int i = 1; i < argc; ++i )
+    {
+        std::string_view arg = argv[ i ];
+
+        if ( arg == "-i" || arg == "--interactive" )
+            interactive = true;
+        else
+        {
+            std::cerr << "Invalid option" << std::endl;
+            return EXIT_FAILURE;
+        }
+    }
+
     constexpr std::string_view title( "Mandelbrot set visualizer" );
     constexpr int width = 1280;
     constexpr int height = 720;
@@ -23,6 +40,12 @@ int main()
     renderer.set_colour( 0, 0, 0 );
     renderer.clear();
     renderer.render();
+
+    if ( !interactive )
+    {
+        mb.save( filename );
+        return EXIT_SUCCESS;
+    }
 
     SDL_Event event;
     while ( !context.should_quit() )
