@@ -9,9 +9,16 @@
 #include "sdl2/sdl_window.hpp"
 
 
+static int error( std::string_view msg )
+{
+    std::cerr << msg << std::endl;
+    return EXIT_FAILURE;
+}
+
 int main( int argc, char **argv )
 {
     bool interactive = false;
+    bool change_output = false;
     std::string_view filename = "mandelbrot.png";
 
     for ( int i = 1; i < argc; ++i )
@@ -20,12 +27,21 @@ int main( int argc, char **argv )
 
         if ( arg == "-i" || arg == "--interactive" )
             interactive = true;
-        else
+        else if ( arg == "-o" || arg == "--output" )
         {
-            std::cerr << "Invalid option" << std::endl;
-            return EXIT_FAILURE;
+            if ( argv[ ++i ] == nullptr )
+                return error( "Missing output value" );
+
+            filename = argv[ i ];
+            change_output = true;
         }
+        else
+            return error( "Invalid option" );
     }
+
+    if ( interactive && change_output )
+        return error( "Options 'interactive' and 'output'"
+                      " are mutually exclusive" );
 
     constexpr std::string_view title( "Mandelbrot set visualizer" );
     constexpr int width = 1280;
