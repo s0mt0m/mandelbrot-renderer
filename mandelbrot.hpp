@@ -17,7 +17,7 @@ struct mandelbrot
     using colour_t = std::tuple< int, int, int >;
 
     constexpr static float_t ratio = float_t( 2 ) / float_t( 3 );
-    constexpr static int max_iterations = 64;
+    int max_iterations = 32;
     constexpr static std::array< colour_t, 16 > colours{ {
         {  66,  30,  15 },
         {  25,   7,  26 },
@@ -96,12 +96,14 @@ struct mandelbrot
     void zoom_in( int x, int y )
     {
         _zoom( x, y, ratio );
+        max_iterations += 2;
         update();
     }
 
     void zoom_out( int x, int y )
     {
         _zoom( x, y, float_t( 1 ) / ratio );
+        max_iterations = std::min( 64, max_iterations - 2 );
         update();
     }
 
